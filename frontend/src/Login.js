@@ -1,35 +1,43 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 export default function Login({ onLogin }) {
   const [creds, setCreds] = useState({});
+  const [error, setError] = useState(""); 
   const navigate = useNavigate();
-  function handleLogin() {
-    // For demonstration purposes only.
-    if (creds.username === "admin" && creds.password === "123") {
-      onLogin && onLogin({ username: creds.username });
-      navigate("/stats");
+
+  const handleLogin = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(creds),
+      });
+      if (res.ok) {
+        onLogin({ username: creds.username });
+        navigate("/stats");
+      } else {
+        setError("Sai tên đăng nhập hoặc mật khẩu!");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Lỗi máy chủ!");
     }
-  }
+  };
+
   return (
-    <div style={{ padding: 10 }}>
-      {" "}
-      <br />
-      <span>Username:</span>
-      <br />
+    <div className="login">
+      <label>Tên đăng nhập:</label>
       <input
-        type="text"
         onChange={(e) => setCreds({ ...creds, username: e.target.value })}
       />
-      <br />
-      <span>Password:</span>
-      <br />
+      <label>Mật khẩu:</label>
       <input
         type="password"
         onChange={(e) => setCreds({ ...creds, password: e.target.value })}
       />
-      <br />
-      <br />
-      <button onClick={handleLogin}>Login</button>{" "}
+      <button onClick={handleLogin}>Đăng nhập</button>
+      {error && <p>{error}</p>}
     </div>
   );
 }

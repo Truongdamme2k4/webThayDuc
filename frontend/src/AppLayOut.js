@@ -15,6 +15,8 @@ import PostLists from "./pages/PostLists";
 import Post from "./pages/Post";
 import Login from "./Login";
 import Stats from "./Stats";
+import NewPost from "./pages/NewPost";
+import ProtectedRoute from "./pages/ProtectedRoute";
 export default function AppLayOut() {
   const [user, setUser] = useState();
   const navigate = useNavigate();
@@ -51,9 +53,14 @@ export default function AppLayOut() {
           </Link>
         )}
         {user && (
-          <span onClick={logOut} style={{ padding: 5, cursor: "pointer" }}>
-            Logout{" "}
-          </span>
+          <>
+            <Link to="/newpost" className="nav-link">
+              AddPost
+            </Link>
+            <span onClick={logOut} style={{ padding: 5, cursor: "pointer" }}>
+              Logout{" "}
+            </span>
+          </>
         )}
       </nav>
       <Routes>
@@ -61,7 +68,15 @@ export default function AppLayOut() {
         <Route path="/posts" element={<Posts />}>
           <Route index element={<PostLists />} />
           <Route path=":slug" element={<Post />} />
-        </Route>{" "}
+        </Route>
+        <Route
+          path="/newpost"
+          element={
+            <ProtectedRoute user={user}>
+              <NewPost />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login onLogin={setUser} />} />
         <Route path="/stats" element={<Stats user={user} />} />

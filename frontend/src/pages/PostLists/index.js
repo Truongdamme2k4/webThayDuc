@@ -12,13 +12,13 @@ export default function PostLists() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  useEffect(() => { 
     fetchBlogPosts();
   }, []);
 
   const fetchBlogPosts = async () => {
     try {
-      const response = await fetch('https://c4flhn-3000.csb.app/api/blogs');
+      const response = await fetch('http://localhost:5000/api/blogs');
       const data = await response.json();
       setBlogPosts(data);
       setLoading(false);

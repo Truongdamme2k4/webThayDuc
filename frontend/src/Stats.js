@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import Count from "./Count";
 
 export default function Stats({ user }) {
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }

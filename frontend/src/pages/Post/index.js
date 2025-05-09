@@ -13,7 +13,7 @@ export default function Post() {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`https://c4flhn-3000.csb.app/api/blogs/${slug}`);
+      const response = await fetch(`http://localhost:5000/api/blogs/${slug}`);
       const data = await response.json();
       setPost(data);
       setLoading(false);
