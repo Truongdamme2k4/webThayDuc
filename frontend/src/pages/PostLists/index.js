@@ -8,38 +8,45 @@ import {
 import { useState, useEffect } from 'react';
 
 export default function PostLists() {
-  const [blogPosts, setBlogPosts] = useState({});
+  const [blogPosts, setBlogPosts] = useState([]); // Thay đổi từ đối tượng thành mảng
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchBlogPosts();
   }, []);
 
   const fetchBlogPosts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/blogs');
+      const response = await fetch('http://localhost:5000/api/posts');
+      if (!response.ok) {
+        throw new Error('Không thể lấy danh sách bài viết');
+      }
       const data = await response.json();
-      setBlogPosts(data);
+      setBlogPosts(data); // Dữ liệu là một mảng
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch blog posts');
+      setError(`Lỗi: ${err.message}`);
       setLoading(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Đang tải...</div>;
   if (error) return <div>{error}</div>;
 
   return (
     <ul>
-      {Object.entries(blogPosts).map(([slug, { title }]) => (
-        <li key={slug}>
-          <Link to={`/posts/${slug}`}>
-            <h3>{title}</h3>
-          </Link>
-        </li>
-      ))}
+      {blogPosts.length > 0 ? (
+        blogPosts.map((post) => (
+          <li key={post.slug}>
+            <Link to={`/posts/${post.slug}`}>
+              <h3>{post.title}</h3>
+            </Link>
+          </li>
+        ))
+      ) : (
+        <li>Không có bài viết nào để hiển thị.</li>
+      )}
     </ul>
   );
 }

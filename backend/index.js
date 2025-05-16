@@ -1,50 +1,38 @@
-// index.js
 const express = require("express");
 const cors = require("cors");
+const dbConnect = require("./database/dbConnect");
+const PostRouter = require("./routes/PostRouter");
+
 const app = express();
-const PORT = 5000;
-const bodyParser = require("body-parser");
-const BlogPosts = require("./data/blogPost");
+const PORT = process.env.PORT || 5000; // Sử dụng biến môi trường cho PORT
 
-app.use(cors());
-app.use(bodyParser.json());
+// Kết nối cơ sở dữ liệu MongoDB
+dbConnect();
 
-app.get("/api/blogs", (req, res) => {
-  res.json(BlogPosts);
-});
- 
-app.get("/api/blogs/:slug", (req, res) => {
-  const { slug } = req.params;
-  const blog = BlogPosts[slug];
-  res.json(blog);
-});
+// Middleware
+app.use(cors()); // Cho phép yêu cầu từ các nguồn khác
+app.use(express.json()); // Phân tích cú pháp JSON cho body của yêu cầu
 
-// Add new post
-app.post("/api/blogs", (req, res) => {
-  const { slug, title, description } = req.body;
-  if (!slug || !title || !description) {
-    return res.status(400).json({ error: "Thiếu thông tin bài viết" });
-  }
-  const newPost = {
-    id: BlogPosts.length + 1,
-    slug,
-    title,
-    description,
-  };
-  BlogPosts.push(newPost);
-  res.status(201).json({ message: "Thêm bài viết thành công", post: newPost });
-});
+// Định tuyến API
+app.use("/api", PostRouter); // Sử dụng PostRouter cho các tuyến đường liên quan đến bài viết
 
-// Login API
+// Điểm cuối đăng nhập (cải tiến sau)
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
+  // TODO: Thay thế bằng xác thực dựa trên cơ sở dữ liệu và mã hóa mật khẩu
   if (username === "admin" && password === "123") {
-    res.status(200).json({ message: "Đăng nhập thành công" });
-  } else {
-    res.status(401).json({ message: "Sai tên đăng nhập hoặc mật khẩu" });
+    return res.status(200).json({ message: "Đăng nhập thành công" });
   }
+  return res.status(401).json({ message: "Sai tên đăng nhập hoặc mật khẩu" });
 });
 
-app.listen(PORT, function () {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Middleware xử lý lỗi toàn cục
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Đã xảy ra lỗi máy chủ" });
+});
+
+// Khởi động máy chủ
+app.listen(PORT, () => {
+  console.log(`Máy chủ đang chạy trên http://localhost:${PORT}`);
 });
