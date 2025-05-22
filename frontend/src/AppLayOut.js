@@ -16,49 +16,57 @@ import Post from "./pages/Post";
 import Login from "./Login";
 import Stats from "./Stats";
 import NewPost from "./pages/NewPost";
+import ChangePassword from "./pages/ChangePassword"; // Import từ file .js
 import ProtectedRoute from "./pages/ProtectedRoute";
+import Register from "./Register";
+
 export default function AppLayOut() {
   const [user, setUser] = useState();
   const navigate = useNavigate();
+
   function logOut() {
     setUser(null);
     navigate("/");
   }
+
   return (
     <>
       <nav style={{ margin: 10 }}>
         <Link to="/" style={{ padding: 5 }}>
-          {" "}
-          Home{" "}
+          Home
         </Link>
         <Link to="/posts" style={{ padding: 5 }}>
-          {" "}
-          Posts{" "}
+          Posts
         </Link>
         <Link to="/about" style={{ padding: 5 }}>
-          {" "}
-          About{" "}
+          About
         </Link>
         <span> | </span>
         {user && (
           <Link to="/stats" style={{ padding: 5 }}>
-            {" "}
-            Stats{" "}
+            Stats
           </Link>
         )}
         {!user && (
-          <Link to="/login" style={{ padding: 5 }}>
-            {" "}
-            Login{" "}
-          </Link>
+          <>
+            <Link to="/login" style={{ padding: 5 }}>
+              Login
+            </Link>
+            <Link to="/register" style={{ padding: 5 }}>
+              Register
+            </Link>
+          </>
         )}
         {user && (
           <>
-            <Link to="/newpost" className="nav-link">
+            <Link to="/newpost" style={{ padding: 5 }}>
               AddPost
             </Link>
+            <Link to="/changepassword" style={{ padding: 5 }}>
+              ChangePassword
+            </Link>
             <span onClick={logOut} style={{ padding: 5, cursor: "pointer" }}>
-              Logout{" "}
+              Logout
             </span>
           </>
         )}
@@ -77,9 +85,25 @@ export default function AppLayOut() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/changepassword"
+          element={
+            <ProtectedRoute user={user}>
+              <ChangePassword user={user} />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login onLogin={setUser} />} />
-        <Route path="/stats" element={<Stats user={user} />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute user={user}>
+              <Stats />
+            </ProtectedRoute>
+          }
+         /> 
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </>

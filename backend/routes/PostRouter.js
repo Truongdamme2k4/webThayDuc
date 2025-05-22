@@ -4,8 +4,13 @@ const router = express.Router();
 router.post("/posts", async (request, response) => {
     const post = new Post(request.body);
     try {
+        const exitsPost= await Post.findOne({slug:post.slug});
+        if(exitsPost){
+            return response.status(400).json({message:"Slug đã tồn tại"});
+        }else{
         await post.save();
         response.send(post);
+        }
     } catch (error) {
         response.status(500).send(error);
     }
@@ -29,10 +34,10 @@ router.get("/posts/:slug", async (request, response) => {
         response.status(500).send({ error });
     }
 });
-
+ 
 router.patch("/posts/:slug", async (request, response) => {
     try {
-        const post = await Post.findByIdAndUpdate(request.params.slug,
+        const post = await Post.findOneAndUpdate({slug: request.params.slug},
             request.body,);
         await post.save();
         response.send(post);

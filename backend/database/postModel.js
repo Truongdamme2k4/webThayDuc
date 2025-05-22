@@ -9,5 +9,9 @@ const PostSchema = new mongoose.Schema({
     description: {
         type: String, required: [true, "Please provide a description!"],
     },
-});
+    comments: {
+        type: Array, default: [],
+    }
+},{strict: false}
+);
 module.exports = mongoose.model.Posts || mongoose.model("Posts", PostSchema);

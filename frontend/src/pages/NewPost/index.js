@@ -1,14 +1,15 @@
 import { useState } from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function NewPost() {
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
-    category: "",
     description: "",
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,19 +36,20 @@ export default function NewPost() {
       const response = await fetch("http://localhost:5000/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData),   
       });
-
+      const data= await response.json();
       if (response.ok) {
         setMessage("Thêm bài viết thành công!");
-        setFormData({ title: "", slug: "", description: "" }); // reset form fields
+        setFormData({ title: "", slug: "", description: "" }); 
         setErrors({});
+        navigate("/posts")
       } else {
-        setMessage("Thêm bài viết thất bại!");
+        setMessage(data.message);
       }
     } catch (error) {
       console.error("Lỗi khi thêm bài viết:", error);
-      setMessage("Đã xảy ra lỗi!");
+      setMessage("Đã xảy ra lỗi máy chủ!");
     }
   };
 
